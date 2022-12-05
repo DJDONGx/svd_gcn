@@ -10,9 +10,9 @@ import gc
 #gowalla
 #user,item=29858,40981
 #yelp
-user,item=25677,25815
+# user,item=25677,25815
 #ml-1m
-#user,item=6040,3952
+user,item=6040,3952
 
 result=[]
 dataset='./yelp'

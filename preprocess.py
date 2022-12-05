@@ -7,6 +7,7 @@ import gc
 
 # dataset='./datasets/yelp'
 dataset = './datasets/movielens'
+print(dataset)
 df_train = pd.read_csv(dataset + r'/train_sparse.csv')
 
 # yelp
@@ -61,10 +62,11 @@ print('start!')
 start = time.time()
 q = 400
 niter = 30
-U, value, V = torch.svd_lowrank(rate_matrix, q=q, niter=niter)
-print(U.shape, value.shape, V.shape)
-# U,value,V=torch.svd(R)
+print(f'q {q} niter {niter}')
+# U, value, V = torch.svd_lowrank(rate_matrix, q=q, niter=niter)
+U, value, V = torch.svd(rate_matrix)
 end = time.time()
+print(U.shape, value.shape, V.shape)
 print('processing time is %f' % (end - start))
 print('singular value range %f ~ %f' % (value.min(), value.max()))
 
