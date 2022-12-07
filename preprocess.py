@@ -5,8 +5,17 @@ import pandas as pd
 import time
 import gc
 
+
+pd.set_option('display.max_columns', None)#显示所有的列
+pd.set_option('display.max_rows', None)#显示所有的行
+pd.set_option('expand_frame_repr', False)#不自动换行
+np.set_printoptions(threshold=np.inf)
+np.set_printoptions(linewidth=np.inf)
+np.set_printoptions(precision=2)
+
 # dataset='./datasets/yelp'
 dataset = './datasets/movielens'
+device = 'cuda:7'
 print(dataset)
 df_train = pd.read_csv(dataset + r'/train_sparse.csv')
 
@@ -25,7 +34,7 @@ user, item = 6040, 3952
 alpha = 1
 
 # interaction matrix
-rate_matrix = torch.zeros(user, item).cuda()
+rate_matrix = torch.zeros(user, item).to(device)
 
 for row in df_train.itertuples():
     rate_matrix[row[1], row[2]] = 1
@@ -63,12 +72,17 @@ start = time.time()
 q = 400
 niter = 30
 print(f'q {q} niter {niter}')
-# U, value, V = torch.svd_lowrank(rate_matrix, q=q, niter=niter)
-U, value, V = torch.svd(rate_matrix)
+U, value, V = torch.svd_lowrank(rate_matrix, q=q, niter=niter)
+# U, value, V = torch.svd(rate_matrix)
 end = time.time()
 print(U.shape, value.shape, V.shape)
 print('processing time is %f' % (end - start))
 print('singular value range %f ~ %f' % (value.min(), value.max()))
+
+# start = time.time()
+# print('the rank of matrix ', torch.linalg.matrix_rank(rate_matrix))
+# print(time.time() - start)
+
 
 np.save(dataset + r'/svd_u.npy', U.cpu().numpy())
 np.save(dataset + r'/svd_v.npy', V.cpu().numpy())
