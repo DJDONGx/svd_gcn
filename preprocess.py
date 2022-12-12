@@ -5,10 +5,9 @@ import pandas as pd
 import time
 import gc
 
-
-pd.set_option('display.max_columns', None)#显示所有的列
-pd.set_option('display.max_rows', None)#显示所有的行
-pd.set_option('expand_frame_repr', False)#不自动换行
+pd.set_option('display.max_columns', None)  # 显示所有的列
+pd.set_option('display.max_rows', None)  # 显示所有的行
+pd.set_option('expand_frame_repr', False)  # 不自动换行
 np.set_printoptions(threshold=np.inf)
 np.set_printoptions(linewidth=np.inf)
 np.set_printoptions(precision=2)

@@ -1,3 +1,6 @@
+'''
+不用训练的方法
+'''
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
@@ -14,7 +17,9 @@ import gc
 user, item = 6040, 3952
 
 result = []
-dataset = './yelp'
+# dataset = './datasets/yelp'
+dataset = './datasets/movielens'
+device = 'cuda:4'
 
 # 瀵煎叆鏁版嵁
 df_train = pd.read_csv(dataset + r'/train_sparse.csv')
@@ -22,6 +27,7 @@ df_test = pd.read_csv(dataset + r'/test_sparse.csv')
 
 # load the train/test data
 # load the data
+# train_samples 正样本数量
 train_samples = 0
 # train_data=[[] for i in range(user)]
 test_data = [[] for i in range(user)]
@@ -32,7 +38,7 @@ for row in df_test.itertuples():
     test_data[row[1]].append(row[2])
 ##########################################
 # interaction matrix
-rate_matrix = torch.Tensor(np.load(dataset + r'/rate_sparse.npy')).cuda()
+rate_matrix = torch.Tensor(np.load(dataset + r'/rate_sparse.npy')).to(device)
 
 
 class SVD_GCN(nn.Module):
@@ -43,9 +49,9 @@ class SVD_GCN(nn.Module):
         self.user_size = user_size
         self.item_size = item_size
 
-        svd_filter = self.weight_func(torch.Tensor(np.load(dataset + r'/svd_value.npy')[:req_vec]).cuda())
-        self.user_vector = (torch.Tensor(np.load(dataset + r'/svd_u.npy')[:, :req_vec])).cuda() * svd_filter
-        self.item_vector = (torch.Tensor(np.load(dataset + r'/svd_v.npy')[:, :req_vec])).cuda() * svd_filter
+        svd_filter = self.weight_func(torch.Tensor(np.load(dataset + r'/svd_value.npy')[:req_vec]).to(device))
+        self.user_vector = (torch.Tensor(np.load(dataset + r'/svd_u.npy')[:, :req_vec])).to(device) * svd_filter
+        self.item_vector = (torch.Tensor(np.load(dataset + r'/svd_v.npy')[:, :req_vec])).to(device) * svd_filter
 
     def weight_func(self, sig):
         return torch.exp(self.beta * sig)
@@ -81,6 +87,7 @@ class SVD_GCN(nn.Module):
         # accuracy on test data
         ndcg10, ndcg20, recall10, recall20 = 0.0, 0.0, 0.0, 0.0
         predict = self.predict()
+        print(predict.shape)
 
         idcg_set = cal_idcg()
         for now_user in range(user):
@@ -111,7 +118,7 @@ class SVD_GCN(nn.Module):
 # Model training and test
 
 model = SVD_GCN(user, item)
-
+print('start')
 model.test()
 
 output = pd.DataFrame(result)
